@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/css/order.css">
+    <script type="text/javascript" src="/layui/layui.all.js"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+
+<div class="nav-layui">
+    <div th:replace="common::navigationBar"></div>
+</div>
+
+
+<div class="header">
+    <div class="headerLayout w1200">
+        <div class="headerCon">
+            <h1 class="mallLogo">
+                <a href="#" title="母婴商城">
+                    <img src="/img/logo.png">
+                </a>
+            </h1>
+            <div th:replace="common::navigationSearch"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content content-nav-base orderlist-content">
+    <div th:replace="common::navigationNav"></div>
+    <div th:replace="common::commonCarousel"></div>
+    <div class="layui-clear w1200">
+        <div class="detail">
+            <h4>订单中心</h4>
+            <div id="collapse-list" class="layui-collapse">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">订单编号:<span>13278515478</span>
+                        <span class="dateTime">时间:2017/8/9</span>
+                        <span class="amount">总金额:1000.58</span>
+                    </h2>
+                    <div class="layui-colla-content padding-zero">
+                        <div class="order-content">
+<!--                            <ul class="item-content layui-clear">
+                                <li class="th th-item">
+                                    <div class="item-cont">
+                                        <a target="_blank">
+                                            <img src="/img/more1.jpg" alt="">
+                                        </a>
+                                        <div class="text">
+                                            <div class="title">测试商品</div>
+                                            <p>测试商品测试商品测试商品测试商品测试商品测试商品测试商品测试商品</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="th th-price">
+                                    单价：<span class="th-su">199.00</span>
+                                </li>
+                                <li class="th th-count">
+                                    数量：<span class="sum">2</span>
+                                </li>
+                            </ul>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="paging" style="text-align: center;"></div>
+    </div>
+</div>
+
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/js/util/'
+    }).use(['nav'], function () {
+        let $ = layui.$,
+            layer = layui.layer, laypage = layui.laypage,
+            element = layui.element, carousel = layui.carousel,
+            nav = layui.nav, form = layui.form;
+
+        //图片轮播
+        carousel.render({
+            elem: '#carousel'
+            , width: '1200px'
+            , height: '180px'
+            , interval: 5000
+        });
+        element.render('nav');
+
+        // 模糊查询
+        form.on('submit(search_form)', function (data) {
+            location.href = "/gotoCommodity?searchCondition=" + data.field.searchCondition;
+        });
+
+        // 注销
+        $("#logout").click(function () {
+            nav.logout();
+        });
+
+        pageRender();
+
+        // 封装分页
+        function pageRender() {
+            laypage.render({
+                elem: 'paging'
+                , count: [[${orderCount}]]
+                , limit: 5
+                , jump: function (obj, first) {
+                    $.get('/order/page',
+                        {
+                            page: obj.curr,
+                            limit: obj.limit,
+                            userId: [[${session.mallUser.userId}]]
+                        }, function (res) {
+                            let strVal = "";
+                            if (res.count < 1) {
+                                strVal += `<p class="commodity-not">暂无订单</p>`;
+                            } else {
+                                Array.from(res.data).forEach((value) => {
+                                    strVal += `
+                                    <div class="layui-colla-item">
+                                        <h2 class="layui-colla-title">
+                                            <span class="orderNum">订单编号：${value.orderNum}</span>
+                                            <span class="dateTime">时间：${value.createTime}</span>
+                                            <span class="amount">总金额：￥${value.orderAmount}</span>
+                                            <span class="orderStatus">支付状态: <span>${value.orderStatus}</span></span>
+                                        </h2>
+                                        <div class="layui-colla-content padding-zero">
+                                            <div class="order-content" id="list-cont">`;
+                                    Array.from(value.orderItems).forEach((temp) => {
+                                        let commodity = temp.commodity;
+                                        if (commodity.commodityName.length > 12) {
+                                            commodity.commodityName = commodity.commodityName.substr(0, 12) + "...";
+                                        }
+                                        if (commodity.commodityIntro.length > 24) {
+                                            commodity.commodityIntro = commodity.commodityIntro.substr(0, 24) + "...";
+                                        }
+                                        strVal += `
+                                        <ul class="item-content layui-clear">
+                                            <li class="th th-item">
+                                                <div class="item-cont">
+                                                    <a target="_blank">
+                                                        <img src="${commodity.coverImg}">
+                                                    </a>
+                                                    <div class="text">
+                                                        <div class="title">${commodity.commodityName}</div>
+                                                        <p>${commodity.commodityIntro}</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="th th-price">
+                                                单价：<span class="th-su">${commodity.sellingPrice}</span>
+                                            </li>
+                                            <li class="th th-count">
+                                                数量：<span class="sum">${temp.buyCounts}</span>
+                                            </li>
+                                        </ul>
+                                        `
+                                    });
+                                    strVal += `</div></div></div>`
+                                });
+                                console.log(strVal);
+                            }
+                            $("#collapse-list").html(strVal);
+                            element.render('collapse');
+                        }
+                    );
+                }
+            });
+        }
+
+    });
+</script>
+</body>
+</html>

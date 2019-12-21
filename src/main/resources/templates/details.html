@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css">
+    <script type="text/javascript" src="/layui/layui.all.js"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+
+<div class="nav-layui">
+    <div th:replace="common::navigationBar"></div>
+</div>
+
+
+<div class="header">
+    <div class="headerLayout w1200">
+        <div class="headerCon">
+            <h1 class="mallLogo">
+                <a href="#" title="母婴商城">
+                    <img src="/img/logo.png">
+                </a>
+            </h1>
+            <div th:replace="common::navigationSearch"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content content-nav-base datails-content">
+    <div th:replace="common::navigationNav"></div>
+    <div class="data-cont-wrap w1200">
+        <div class="crumb">
+            <a href="javascript:;">首页</a>
+            <span>></span>
+            <a href="javascript:;">所有商品</a>
+            <span>></span>
+            <a href="javascript:;">产品详情</a>
+        </div>
+        <div class="product-intro layui-clear">
+            <div class="preview-wrap">
+                <a href="javascript:;"><img class="commodity-detail-img" th:src="${commodity.showImg}"></a>
+            </div>
+            <div class="itemInfo-wrap">
+                <div class="itemInfo">
+                    <div class="title">
+                        <h4 class="datails-title-h4" th:text="${commodity.commodityName}"></h4>
+                        <input id="commodityId" type="hidden" th:value="${commodity.commodityId}"/>
+                        <span><i class="layui-icon layui-icon-rate-solid"></i>收藏</span>
+                    </div>
+                    <div class="summary">
+                        <p class="reference"><span>参考价</span>
+                            <del>￥[[${commodity.originalPrice}]]</del>
+                        </p>
+                        <p class="activity"><span>活动价</span><strong class="price"><i>￥</i>[[${commodity.sellingPrice}]]</strong>
+                        </p>
+                    </div>
+                    <div class="layui-collapse datails-collapse">
+                        <div class="layui-colla-item">
+                            <h2 class="layui-colla-title colla-title">商品简介</h2>
+                            <div class="layui-colla-content layui-show" th:text="${commodity.commodityIntro}"></div>
+                        </div>
+                    </div>
+                    <div class="choose-attrs">
+                        <div class="number layui-clear"><span class="title">数&nbsp;&nbsp;&nbsp;&nbsp;量</span>
+                            <div class="number-cont"><span class="cut btn">-</span>
+                                <input id="commodityCount"
+                                       onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                       onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                       maxlength="4" type="text" value="1"><span
+                                        class="add btn">+</span></div>
+                        </div>
+                    </div>
+                    <div class="choose-btns">
+                        <button class="layui-btn layui-btn-primary purchase-btn">立刻购买</button>
+                        <button class="layui-btn  layui-btn-danger car-btn"><i
+                                class="layui-icon layui-icon-cart-simple"></i>加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-clear" style="display: flex;">
+            <div class="aside">
+                <h4>热销推荐</h4>
+                <div class="item-list">
+                    <div th:each="item : ${commodities}" class="item">
+                        <img th:src="${item.coverImg}">
+                        <p><span th:text="${#strings.abbreviate(item.commodityName,12)}"></span><span
+                                class="pric">￥[[${item.sellingPrice}]]</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="detail" style="width:800px;margin-left: 30px;">
+                <h4>详情</h4>
+                <!--                <div class="item">
+                                    <img class="datails-content-img" src="http://localhost:8080/commodityImg/d391a501788df043.jpg">
+                                    <img class="datails-content-img" src="http://localhost:8080/commodityImg/5b5a8e97N1d1eaf04.jpg">
+                                    <img class="datails-content-img" src="http://localhost:8080/commodityImg/5b5a9185Nb0cedb6b.jpg">
+                                </div>-->
+                <div class="item" th:utext="${commodity.detailContent}">
+                </div>
+                <hr class="layui-bg-red">
+                <div class="layui-collapse datails-collapse">
+                    <div class="layui-colla-item">
+                        <h2 class="layui-colla-title colla-title">全部评论<span class="comment-count"
+                                                                            th:text="${commentCount}"></span>
+                        </h2>
+                        <div class="layui-colla-content layui-show comment-content">
+                            <div id="list-cont" class="list-cont"></div>
+                            <div id="paging" style="text-align: center;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-collapse datails-collapse">
+                    <div class="layui-colla-item">
+                        <h2 class="layui-colla-title colla-title">评论内容</h2>
+                        <textarea id="commentContent" placeholder="既然来了,不如说几句" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button type="submit" class="layui-btn" id="commentSubmit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/js/util/'
+    }).use(['nav'], function () {
+        let $ = layui.$,
+            form = layui.form,
+            layer = layui.layer,
+            element = layui.element,
+            laypage = layui.laypage,
+            nav = layui.nav;
+
+        let commodityId = $("#commodityId").val();
+
+        element.render('nav');
+
+        // 页面加载时渲染
+        pageRender();
+
+        // 封装分页
+        function pageRender() {
+            laypage.render({
+                elem: 'paging'
+                , count: [[${commentCount}]]
+                , limit: 5
+                , jump: function (obj, first) {
+                    $.get('/comment/page',
+                        {
+                            page: obj.curr,
+                            limit: obj.limit,
+                            commodityId: [[${commodity.commodityId}]]
+                        }, function (res) {
+                            let strVal = "";
+                            if (res.count < 1) {
+                                strVal += `<p class="commodity-not">暂无评论</p>`;
+                            } else {
+                                Array.from(res.data).forEach((value) => {
+                                    strVal += `<div class="cont">
+                                    <div class="img">
+                                        <img src="${value.user.userImg}" style="width:50px;" alt="">
+                                        <p class="tit"><span class="name">${value.user.userName}</span><span class="date">${value.createTime}</span>
+                                        </p>
+                                    </div>
+                                    <div class="text">
+                                        <p class="ct">${value.commentContent}</p>
+                                    </div>
+                                </div>`;
+                                    strVal += `<hr class="layui-bg-gray">`;
+                                });
+                            }
+                            $("#list-cont").html(strVal);
+                        }
+                    );
+                }
+            });
+        }
+
+        // 注销
+        $("#logout").click(function () {
+            nav.logout();
+        });
+
+        // 模糊查询
+        form.on('submit(search_form)', function (data) {
+            location.href = "/gotoCommodity?searchCondition=" + data.field.searchCondition;
+        });
+
+        let cur = $('.number-cont input').val();
+        $('.number-cont .btn').on('click', function () {
+            if ($(this).hasClass('add')) {
+                cur++;
+            } else {
+                if (cur > 1) {
+                    cur--;
+                }
+            }
+            $('.number-cont input').val(cur)
+        });
+
+        // 支付
+        $('.purchase-btn').on('click', function () {
+            let buyCounts = $("#commodityCount").val();
+            if ([[${session.mallUser}]] != null){
+                let index = layer.load(2);
+                $.post("/order/addCommodityOrder",{
+                    commodityId : commodityId,
+                    buyCounts : buyCounts
+                },function () {
+                    layer.close(index);
+                    location.href = "/gotoCreateOrder";
+                });
+            }else{
+                layer.alert("请先登录！", {icon: 2});
+            }
+        });
+
+        // 评论提交
+        $('#commentSubmit').on('click', function () {
+            let commentContent = $('#commentContent').val();
+            let data = {
+                commodityId: commodityId,
+                commentContent: commentContent
+            };
+            $.post("/comment/add", data, function (res) {
+                if (typeof res === "string") {
+                    res = JSON.parse(res);
+                }
+                if (res.resultCode === 200) {
+                    layer.msg("添加成功", {
+                        time: 1000,
+                        end: function () {
+                            pageRender();
+                        }
+                    });
+                } else {
+                    layer.alert(res.message, {icon: 2});
+                }
+            });
+        });
+
+        // 添加购物车
+        document.getElementsByClassName("car-btn")[0].onclick = function () {
+            let commodityCount = $("#commodityCount").val();
+            let data = {
+                commodityId: commodityId,
+                commodityCount: commodityCount
+            };
+            $.post("/shoppCart/add", data, function (res) {
+                if (typeof res === "string") {
+                    res = JSON.parse(res);
+                }
+                if (res.resultCode === 200) {
+                    layer.msg("添加成功");
+                } else {
+                    layer.alert(res.message, {icon: 2});
+                }
+            });
+        };
+    });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css">
+    <script type="text/javascript" src="/layui/layui.all.js"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+
+<div class="nav-layui">
+    <div th:replace="common::navigationBar"></div>
+</div>
+
+<div class="header">
+    <div class="headerLayout w1200">
+        <div class="headerCon">
+            <h1 class="mallLogo">
+                <a href="#" title="母婴商城">
+                    <img src="/img/logo.png">
+                </a>
+            </h1>
+            <div th:replace="common::navigationSearch"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content content-nav-base commodity-content">
+    <div th:replace="common::navigationNav"></div>
+    <div class="commod-cont-wrap">
+        <div class="commod-cont w1200 layui-clear">
+            <div class="left-nav">
+                <div class="title">所有分类</div>
+                <div class="list-box">
+                    <dl th:each="menu:${listCategory}">
+                        <dt th:text="${menu.categoryName}"></dt>
+                        <dd th:each="twoCategory:${menu.twoCategorys}">
+                            <a th:href="@{'/gotoCommodity?categoryId='+${twoCategory.getCategoryId()}}"
+                               th:text="${twoCategory.categoryName}"></a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="right-cont-wrap">
+                <div class="right-cont">
+                    <div class="sort layui-clear">
+                        <a href="javascript:;" data-condition="isSalesVolume" data-sign="1">销量</a>
+                        <a href="javascript:;" data-condition="isSellingPrice" data-sign="1">价格</a>
+                        <a href="javascript:;" data-condition="isCreateTime" data-sign="1">新品</a>
+                    </div>
+                    <div class="cont-list layui-clear" id="list-cont">
+                    </div>
+                    <div id="paging" style="text-align: center;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/js/util/'
+    }).use(['nav'], function () {
+        let $ = layui.$,
+            layer = layui.layer,
+            element = layui.element,
+            laypage = layui.laypage,
+            nav = layui.nav, form = layui.form;
+
+        element.render('nav');
+
+        let count = 0;
+
+        let searchCondition = [[${searchCondition}]];
+
+        let categoryId = [[${categoryId}]];
+
+        // 注销
+        $("#logout").click(function () {
+            nav.logout();
+        });
+
+        // 初始化渲染
+        initCommodityList();
+
+        // 获取总条数
+        function initCommodityList(key, value) {
+            let data = {};
+            if (categoryId != null) data["categoryId"] = categoryId;
+            if (searchCondition != null) data["searchCondition"] = searchCondition;
+            if (key != null && value != null) data[key] = value;
+            console.log(data);
+            $.ajax({
+                url: "/commodity/pageCount",
+                type: "get",
+                data: data,
+                success: function (res) {
+                    laypage.render({
+                        elem: 'paging'
+                        , count: res.data
+                        , limit: 6
+                        , jump: function (obj, first) {
+                            data["page"] = obj.curr;
+                            data["limit"] = obj.limit;
+                            console.log(data);
+                            $.get('/commodity/page', data, function (res) {
+                                    let strVal = "";
+                                    if (res.data.length < 1) {
+                                        strVal += `<p class="commodity-not">暂无该类商品</p>`;
+                                    } else {
+                                        Array.from(res.data).forEach((value) => {
+                                            if (value.commodityName.length > 25) {
+                                                value.commodityName = value.commodityName.substr(0, 25) + "...";
+                                            }
+                                            strVal += `<div class="item">
+                                                <img class="commodity-img" onclick="commodityDetail(${value.commodityId},${value.categoryId})" src="${value.coverImg}">
+                                            <div class="text">
+                                                <p class="title">${value.commodityName}</p>
+                                                <p class="price">
+                                                    <span class="pri">￥${value.sellingPrice}</span>
+                                                    <span class="nub">${value.salesVolume}付款</span>
+                                                </p>
+                                            </div>
+                                        </div>`;
+                                        });
+                                    }
+                                    $("#list-cont").html(strVal);
+                                }
+                            )
+                        }
+                    });
+                }
+            });
+        }
+
+
+        // 条件排序
+        $('.sort a').on('click', function () {
+            let key = $(this).attr("data-condition"), value = $(this).attr("data-sign");
+            initCommodityList(key, value);
+            $(this).addClass('active').siblings().removeClass('active');
+        });
+
+        // 模糊查询
+        form.on('submit(search_form)', function (data) {
+            searchCondition = data.field.searchCondition;
+            categoryId = null;
+            initCommodityList();
+            return false;
+        });
+
+        // 侧边导航栏
+        $('.list-box dt').on('click', function () {
+            if ($(this).attr('off')) {
+                $(this).removeClass('active').siblings('dd').show()
+                $(this).attr('off', '')
+            } else {
+                $(this).addClass('active').siblings('dd').hide()
+                $(this).attr('off', true)
+            }
+        });
+    });
+
+    function commodityDetail(commodityId, categoryId) {
+        location.href = "/gotoCommodityDetail?commodityId=" + commodityId + "&categoryId=" + categoryId;
+    }
+</script>
+
+
+</body>
+</html>

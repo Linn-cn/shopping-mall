@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/css/order.css">
+    <script type="text/javascript" src="/layui/layui.all.js"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+
+<div class="nav-layui">
+    <div th:replace="common::navigationBar"></div>
+</div>
+
+
+<div class="header">
+    <div class="headerLayout w1200">
+        <div class="headerCon">
+            <h1 class="mallLogo">
+                <a href="#" title="母婴商城">
+                    <img src="/img/logo.png">
+                </a>
+            </h1>
+            <div th:replace="common::navigationSearch"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content content-nav-base createOrder-content">
+    <div th:replace="common::navigationNav"></div>
+    <div th:replace="common::commonCarousel"></div>
+    <div class="layui-clear w1200">
+        <div class="detail">
+            <h4>填写并核对订单详情</h4>
+            <div th:if="${session.order.orderNum != null}" class="layui-collapse order-number">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title colla-title">订单编号</h2>
+                    <div class="layui-colla-content layui-show" th:text="${session.order.orderNum}"></div>
+                </div>
+            </div>
+            <table class="layui-table" lay-skin="line">
+                <thead>
+                <tr>
+                    <th>商品详情</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${session.commodities}">
+                    <td>
+                        <img class="commodity-img" th:src="${item.coverImg}">
+                        <div class="text" th:data-id="${item.commodityId}">
+                            <div class="title" th:text="${#strings.abbreviate(item.commodityName,12)}"></div>
+                            <p th:text="${#strings.abbreviate(item.commodityIntro,24)}"></p>
+                        </div>
+                    </td>
+                    <td><p>￥<span class="commodity-price" th:text="${item.sellingPrice}"></span>x<span
+                            class="buy-count" th:text="${item.buyCounts}"></span></p></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="layui-collapse">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title colla-title">收货地址</h2>
+                    <div class="order-address">
+                        <input type="text" id="userAddress" class="layui-input"
+                               th:disabled="${session.order.orderNum != null}"
+                               th:value="${session.order.userAddress}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-collapse order-pay">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title colla-title">支付方式&nbsp;&nbsp;<span class="layui-badge">当前只支持在线支付</span>
+                    </h2>
+                    <div class="layui-colla-content layui-show">支付方式：在线支付</div>
+                </div>
+            </div>
+            <div class="order-footer">
+                <p class="total">应付：<span class="totalNum" th:text="${session.order.orderAmount}"></span>元</p>
+                <button th:if="${session.order.orderStatus eq '10'}" class="layui-btn layui-btn-radius layui-btn-danger submit">立即结算</button>
+                <button th:if="${session.order.orderStatus eq '20'}" class="layui-btn layui-btn-radius layui-btn-normal gotoCommodity">已经支付,继续购物</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/js/util/'
+    }).use(['nav'], function () {
+        let $ = layui.$,
+            layer = layui.layer,
+            element = layui.element, carousel = layui.carousel,
+            nav = layui.nav, form = layui.form;
+
+        //图片轮播
+        carousel.render({
+            elem: '#carousel'
+            , width: '1200px'
+            , height: '180px'
+            , interval: 5000
+        });
+        element.render('nav');
+
+        // 模糊查询
+        form.on('submit(search_form)', function (data) {
+            location.href = "/gotoCommodity?searchCondition=" + data.field.searchCondition;
+        });
+
+        // 继续购物
+        $(".gotoCommodity").on("click",function () {
+            location.href = "/gotoCommodity";
+        });
+
+        // 注销
+        $("#logout").click(function () {
+            nav.logout();
+        });
+
+        if ([[${session.errorMessage}]] != null){
+            layer.alert([[${session.errorMessage}]], {icon: 2});
+        }
+
+        $(".submit").on("click", function () {
+            let commodityIds = document.getElementsByClassName("text");
+            let buyCounts = document.getElementsByClassName("buy-count");
+            let orderItems = [];
+            for (let i = 0; i < commodityIds.length; i++) {
+                let orderItem = {};
+                orderItem.commodityId = commodityIds[i].getAttribute("data-id");
+                orderItem.buyCounts = parseInt(buyCounts[i].innerText);
+                orderItems[i] = orderItem;
+            }
+            let data = {
+                orderItems : orderItems,
+                userAddress : $("#userAddress").val()
+            };
+            $.ajax({
+                url:"/order/createOrder",
+                data: JSON.stringify(data),
+                contentType:"application/json",
+                type:"post",
+                success:function (res) {
+                    if (typeof res === "string") {
+                        res = JSON.parse(res);
+                    }
+                    if (res.resultCode === 200) {
+                        layer.load(2, {
+                            time: 2000,
+                            end: function () {
+                                location.href = "/alipay/goAlipay?orderId=" + res.data.orderId;
+                            }
+                        });
+                    } else {
+                        layer.alert(res.message, {icon: 2});
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

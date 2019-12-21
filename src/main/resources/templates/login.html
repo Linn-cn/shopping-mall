@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/css/login.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css">
+    <script type="text/javascript" src="/layui/layui.all.js"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+
+<div class="nav-layui">
+    <div th:replace="common::navigationBar"></div>
+</div>
+
+
+<div class="header">
+    <div class="headerLayout w1200">
+        <div class="headerCon">
+            <h1 class="mallLogo">
+                <a href="#" title="母婴商城">
+                    <img src="/img/logo.png">
+                </a>
+            </h1>
+            <div th:replace="common::navigationSearch"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content content-nav-base  login-content">
+    <div th:replace="common::navigationNav"></div>
+    <div class="login-bg">
+        <div th:if="${session.mallUser} == null" class="login-cont w1200">
+            <div class="login-box">
+                <div class="layui-form">
+                    <legend>手机号登录</legend>
+                    <div class="layui-form-item">
+                        <div class="layui-inline iphone">
+                            <div class="layui-input-inline">
+                                <i class="layui-icon layui-icon-cellphone iphone-icon"></i>
+                                <input type="tel" name="userPhone" id="phone" lay-verify="required|phone"
+                                       placeholder="请输入手机号" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline iphone">
+                            <div class="layui-input-inline">
+                                <i class="layui-icon layui-icon-password iphone-icon"></i>
+                                <input type="password" name="userPassword" id="ipassword" lay-verify="required"
+                                       placeholder="请输入密码"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="display: flex">
+                            <div class="layui-input-inline">
+                                <input type="text" name="verifyCode" lay-verify="required" placeholder="验证码"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-input-inline" style="margin-right: 0px;">
+                                <img id="loginVerifyCode" th:src="@{/common/loginKaptcha}"
+                                     onclick="this.src='/common/loginKaptcha'">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item login-btn">
+                        <div class="layui-inline" style="display: flex">
+                            <button id="login" class="layui-violet layui-btn layui-btn-fluid" lay-submit=""
+                                    lay-filter="login">登录
+                            </button>
+                            <button id="gotoRegister" class="layui-violet layui-btn layui-btn-fluid">前往注册
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="register-box" style="display: none">
+                <form id="register-form" class="layui-form">
+                    <legend>手机号注册</legend>
+                    <div class="layui-form-item">
+                        <div class="layui-inline iphone">
+                            <div class="layui-input-inline">
+                                <i class="layui-icon layui-icon-cellphone iphone-icon"></i>
+                                <input type="tel" name="userPhone" lay-verify="required|phone"
+                                       placeholder="请输入手机号" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline iphone">
+                            <div class="layui-input-inline">
+                                <i class="layui-icon layui-icon-password iphone-icon"></i>
+                                <input type="password" id="userPassword" name="userPassword" lay-verify="required"
+                                       placeholder="请输入密码"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline iphone">
+                            <div class="layui-input-inline">
+                                <i class="layui-icon layui-icon-password iphone-icon"></i>
+                                <input type="password" name="checkPassword" lay-verify="required|checkPassword"
+                                       placeholder="再次输入密码"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="display: flex">
+                            <div class="layui-input-inline">
+                                <input type="text" name="verifyCode" lay-verify="required" placeholder="验证码"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-input-inline" style="margin-right: 0px;">
+                                <img id="registerVerifyCode" th:src="@{/common/registerKaptcha}"
+                                     onclick="this.src='/common/registerKaptcha'">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item login-btn">
+                        <div class="layui-inline" style="display: flex">
+                            <button class="layui-violet layui-btn layui-btn-fluid" lay-submit="" lay-filter="register">
+                                注册
+                            </button>
+                            <input type="button" id="gotoLogin" class="layui-violet layui-btn layui-btn-fluid"
+                                   value="前往登录"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div th:if="${session.mallUser} != null" class="login-cont w1200">
+            <div class="welcome-box">
+                <div class="layui-form">
+                    <legend>欢迎登录</legend>
+                    <div class="layui-form-item">
+                        <span>打开</span>
+                        <a href="/gotoCommodity" class="common-red">
+                            <i class="layui-icon layui-icon-home"></i>商城首页
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="ng-promise-box">
+        <div class="ng-promise w1200">
+            <p class="text">
+                <a class="icon1" href="javascript:;">7天无理由退换货</a>
+                <a class="icon2" href="javascript:;">满99元全场免邮</a>
+                <a class="icon3" style="margin-right: 0" href="javascript:;">100%品质保证</a>
+            </p>
+        </div>
+    </div>
+    <div class="mod_help w1200">
+        <p>
+            <a href="javascript:;">关于我们</a>
+            <span>|</span>
+            <a href="javascript:;">帮助中心</a>
+            <span>|</span>
+            <a href="javascript:;">售后服务</a>
+            <span>|</span>
+            <a href="javascript:;">母婴资讯</a>
+            <span>|</span>
+            <a href="javascript:;">关于货源</a>
+        </p>
+        <p class="coty">母婴商城版权所有 &copy; 2012-2020</p>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.config({
+        base: '/js/util/'
+    }).use(['nav'], function () {
+        let $ = layui.$, form = layui.form, layer = layui.layer, element = layui.element, nav = layui.nav;
+
+        element.render('nav');
+
+        //自定义验证规则
+        form.verify({
+            checkPassword: function (value) {
+                if ($('#userPassword').val() !== value) {
+                    return '两次密码不一致';
+                }
+            }
+        });
+
+        form.on('submit(login)', function (data) {
+            $.get("/user/login", data.field, function (res) {
+                if (res.resultCode === 200) {
+                    layer.msg("登录成功", {
+                        time: 1000,
+                        end: function () {
+                            location.href = "/gotoLogin";
+                        }
+                    });
+                } else {
+                    layer.msg(res.message, {
+                        time: 1000,
+                        icon: 5,
+                        end: function () {
+                            $("#loginVerifyCode").click();
+                        }
+                    });
+                }
+            });
+            return false;
+        });
+
+        form.on('submit(register)', function (data) {
+            $.post("/user/register", data.field, function (res) {
+                if (res.resultCode === 200) {
+                    layer.msg("注册成功", {
+                        time: 1000,
+                        end: function () {
+                            document.getElementById("register-form").reset();
+                        }
+                    });
+                } else {
+                    layer.msg(res.message, {
+                        time: 1000,
+                        icon: 5,
+                        end: function () {
+                            $("#registerVerifyCode").click();
+                        }
+                    });
+                }
+            });
+            return false;
+        });
+
+        // 模糊查询
+        form.on('submit(search_form)', function (data) {
+            location.href = "/gotoCommodity?searchCondition=" + data.field.searchCondition;
+        });
+
+        $("#logout").click(function () {
+            nav.logout();
+        });
+
+        $("#gotoRegister").click(function () {
+            $(".login-box").css("display", "none");
+            $(".register-box").css("display", "");
+        });
+
+        $("#gotoLogin").click(function () {
+            $(".login-box").css("display", "");
+            $(".register-box").css("display", "none");
+        });
+    })
+</script>
+</body>
+</html>

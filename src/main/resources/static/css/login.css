@@ -1,0 +1,105 @@
+/*login*/
+.login-content .login-bg {
+    width: 100%;
+    background: url(/img/load_bg.jpg) no-repeat;
+    background-size: cover;
+}
+
+.login-content .login-bg .login-cont {
+    height: 772px;
+    position: relative;
+}
+
+.login-content .login-bg .login-cont .login-box {
+    width: 300px;
+    height: 340px;
+    border: 1px solid #d9dadc;
+    background: #fff;
+    position: absolute;
+    top: 196px;
+    right: 90px;
+    padding: 0 30px;
+}
+
+.login-content .login-bg .login-cont .register-box {
+    width: 300px;
+    height: 380px;
+    border: 1px solid #d9dadc;
+    background: #fff;
+    position: absolute;
+    top: 196px;
+    right: 90px;
+    padding: 0 30px;
+}
+
+.login-content .login-bg .login-cont .welcome-box {
+    width: 300px;
+    height: 150px;
+    border: 1px solid #d9dadc;
+    background: #fff;
+    position: absolute;
+    top: 196px;
+    right: 90px;
+    padding: 0 30px;
+}
+
+.login-content .login-bg .login-cont .login-box legend,.register-box legend,.welcome-box legend{
+    font-size: 20px;
+    color: #323232;
+    text-align: center;
+    padding: 25px 0;
+}
+
+.login-content .login-bg .login-cont .layui-inline, .login-content .login-bg .login-cont .layui-input-inline {
+    width: 100%;
+    position: relative;
+}
+
+.login-content .login-bg .login-cont .layui-input-inline .iphone-icon {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    color: #d3d3d3;
+    font-size: 20px;
+}
+
+.login-content .login-bg .login-cont .iphone {
+    margin-bottom: 20px;
+}
+
+.login-content .login-bg .login-cont .iphone .layui-input {
+    padding-left: 40px;
+}
+
+.login-content .login-bg .login-cont .veri-code .layui-btn {
+    width: 102px;
+    background: #eeeeee;
+    text-align: center;
+    color: #333;
+    height: 36px;
+    line-height: 36px;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    font-size: 12px;
+    padding: 0 14px;
+}
+
+.login-content .login-bg .login-cont .login-btn .layui-input-block {
+    margin-left: 0;
+    padding-top: 25px;
+}
+
+.layui-violet{
+    background-color: #cfb2f6!important;
+    font-size: 18px;
+}
+
+.form-margin{
+    margin-bottom: 0px;
+}
+
+/*end-login*/

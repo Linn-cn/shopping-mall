@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css">
+    <script type="text/javascript" src="/layui/layui.all.js"></script>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+
+<div class="nav-layui">
+    <div th:replace="common::navigationBar"></div>
+</div>
+
+<div class="header">
+    <div class="headerLayout w1200">
+        <div class="headerCon">
+            <h1 class="mallLogo">
+                <a href="#" title="母婴商城">
+                    <img src="/img/logo.png">
+                </a>
+            </h1>
+            <div th:replace="common::navigationSearch"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content content-nav-base">
+    <div th:replace="common::navigationNav"></div>
+    <div class="w1200">
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-md6 margin-top-40">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">头像</label>
+                    <div class="layui-inline">
+                        <img class="upload-img" id="userImg" th:src="@{{userImg}(userImg=${session.mallUser.userImg})}">
+                    </div>
+                    <div class="layui-inline upload-button-align">
+                        <div class="layui-btn-container">
+                            <button id="previewImg" type="button" class="layui-btn layui-btn-radius margin-bottom-0">
+                                预览图片
+                            </button>
+                            <button id="uploadImg" type="button" class="layui-btn layui-btn-radius margin-bottom-0">
+                                上传图片
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <div id="uploadErrorText"></div>
+                </div>
+            </div>
+            <form class="layui-form layui-col-sm6 layui-col-md6">
+                <div class="layui-input-block weight-red pwdTips">旧密码请输入用户当前登录密码，新密码必须两次输入一致才能提交</div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机号</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="${session.mallUser.userPhone}" disabled
+                               class="layui-input layui-disabled">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="${session.mallUser.userName}" name="userName" autocomplete="off"
+                               lay-verify="required" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">收货地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:value="${session.mallUser.userAddress}" name="userAddress" autocomplete="off"
+                               lay-verify="required" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">旧密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" value="" placeholder="请输入旧密码" lay-verify="required|oldPwd"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">新密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" value="" placeholder="请输入新密码" lay-verify="required|newPwd" name="userPassword"
+                               id="newPwd" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">确认密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" value="" placeholder="请确认密码" lay-verify="required|confirmPwd"
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="button" class="layui-btn layui-btn-radius" lay-submit="" lay-filter="changeUserInfo"
+                               value="立即修改"/>
+                        <button id="reset" type="reset" class="layui-btn layui-btn-radius layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    layui.config({
+        base: '/js/util/'
+    }).use(['nav'], function () {
+        let $ = layui.$, form = layui.form, layer = layui.layer, element = layui.element, nav = layui.nav,
+            upload = layui.upload;
+
+        element.render('nav');
+
+        $("#logout").click(function () {
+            nav.logout();
+        });
+
+        //选完文件后不自动上传
+        let uploadInst = upload.render({
+            elem: '#previewImg'
+            , url: '/user/uploadImg'
+            , auto: false
+            , bindAction: '#uploadImg'
+            , choose: function (obj) {
+                obj.preview(function (index, file, result) {
+                    $('#userImg').attr('src', result); //图片链接（base64）
+                });
+            }
+            , done: function (res) {
+                if (res.resultCode === 401) {
+                    return layer.msg('请重新登录后在操作',{
+                        time: 1000,
+                        end:function(){
+                            location.href = "/gotoLogin";
+                        }
+                    });
+                }else{
+                    return layer.msg('上传成功',{
+                        time: 1000,
+                        end: function () {
+                            $('.nav-layui').load("/refreshNav");
+                            location.reload();
+                        }
+                    });
+                }
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                let uploadErrorText = $('#uploadErrorText');
+                uploadErrorText.html(
+                    '<span style="color: #FF5722;">上传失败</span>' +
+                    '<a class="margin-left-30 layui-btn layui-btn-xs upload-reload">重试</a>');
+                uploadErrorText.find('.upload-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //添加验证规则
+        form.verify({
+            oldPwd: function (value, item) {
+                let flag;
+                $.ajax({
+                    url: "/user/validatePwd",
+                    type: "get",
+                    async: false,       //关闭异步
+                    data: {"password": value},
+                    success: function (s) {
+                        flag = s.data;
+                    }
+                });
+                if (!flag) {
+                    return '旧密码错误，请重新输入！';
+                }
+            },
+            newPwd: function (value, item) {
+                if (value.length < 6) {
+                    return "密码长度不能小于6位";
+                }
+            },
+            confirmPwd: function (value, item) {
+                console.log("1111");
+                if ($("#newPwd").val() !== value) {
+                    return "两次输入密码不一致，请重新输入！";
+                }
+            }
+        });
+
+        form.on('submit(changeUserInfo)', function (data) {
+            $.post("/user/update",data.field,function (res) {
+                if (res.resultCode === 200){
+                    layer.alert(res.message, {
+                        icon: 1,
+                        end: function () {
+                            $('.nav-layui').load("/refreshNav");
+                            location.reload();
+                        }
+                    });
+                }else{
+                    layer.alert(res.message, {icon: 2});
+                }
+            });
+            return false;
+        });
+
+        // 模糊查询
+        form.on('submit(search_form)', function (data) {
+            location.href = "/gotoCommodity?searchCondition=" + data.field.searchCondition;
+        });
+    });
+
+</script>
+</body>
+</html>

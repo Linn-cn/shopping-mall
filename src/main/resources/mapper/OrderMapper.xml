@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.mall.dao.OrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.shopping.mall.entity.Order">
+        <id column="order_id" property="orderId" />
+        <result column="user_id" property="userId" />
+        <result column="order_num" property="orderNum" />
+        <result column="order_status" property="orderStatus" />
+        <result column="order_amount" property="orderAmount" />
+        <result column="user_address" property="userAddress" />
+        <result column="create_time" property="createTime" />
+        <result column="paid_time" property="paidTime" />
+    </resultMap>
+
+    <!-- 订单分页结果集 -->
+    <resultMap id="pageOrderResult" extends="BaseResultMap" type="com.shopping.mall.entity.dto.OrderDTO">
+        <collection property="orderItems" ofType="com.shopping.mall.entity.dto.OrderItemDTO">
+            <id column="id" property="id" />
+            <result column="buy_counts" property="buyCounts"/>
+            <association property="commodity" resultMap="com.shopping.mall.dao.CommodityMapper.BaseResultMap"/>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        order_id, user_id, order_num, order_status, order_amount, user_address, create_time, paid_time
+    </sql>
+
+    <select id="pageOrderByUserId" parameterType="map" resultMap="pageOrderResult">
+        SELECT
+            mr.order_id,
+            mr.order_num,
+            mr.order_amount,
+        CASE
+            mr.order_status
+            WHEN '10' THEN
+            '未支付'
+            WHEN '20' THEN
+            '已支付'
+            END order_status,
+            mr.create_time,
+            im.id,
+            im.buy_counts,
+            cy.commodity_id,
+            cy.cover_img,
+            cy.commodity_name,
+            cy.commodity_intro,
+            cy.selling_price
+        FROM
+            shooping_mall_order mr
+            LEFT JOIN shooping_mall_order_item im ON mr.order_id = im.order_id
+            LEFT JOIN shooping_mall_commodity cy ON im.commodity_id = cy.commodity_id
+        WHERE
+            mr.user_id = #{userId}
+            ORDER BY mr.create_time desc
+            LIMIT #{page.start},#{page.limit}
+    </select>
+
+</mapper>

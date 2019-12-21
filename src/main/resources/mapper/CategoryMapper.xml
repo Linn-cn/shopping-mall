@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.mall.dao.CategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.shopping.mall.entity.Category">
+        <id column="category_id" property="categoryId" />
+        <result column="parent_id" property="parentId" />
+        <result column="category_name" property="categoryName" />
+        <result column="category_level" property="categoryLevel" />
+        <result column="category_rank" property="categoryRank" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 一二级类别映射结果 -->
+    <resultMap id="ListCategoryResult" extends="BaseResultMap" type="com.shopping.mall.entity.dto.CategoryDTO">
+        <collection property="twoCategorys" ofType="com.shopping.mall.entity.Category">
+            <id column="twoId" property="categoryId" />
+            <result column="twoName" property="categoryName" />
+            <result column="twoLevel" property="categoryLevel" />
+            <result column="twoRank" property="categoryRank" />
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        category_id, parent_id, category_name, category_level, category_rank, create_time, update_time
+    </sql>
+
+    <!-- 分类列表展示 -->
+    <select id="listCategory" resultMap="ListCategoryResult">
+        SELECT
+            one.category_id,
+            one.category_name,
+            two.category_id twoId,
+            two.category_name twoName,
+            two.category_level twoLevel,
+            two.category_rank twoRank
+        FROM
+            shooping_mall_category one
+            JOIN shooping_mall_category two ON one.category_id = two.parent_id
+            AND one.parent_id = 0
+        ORDER BY
+            one.category_id,
+            one.category_name;
+    </select>
+
+</mapper>

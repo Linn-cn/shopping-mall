@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.mall.dao.CommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.shopping.mall.entity.Comment">
+        <id column="comment_id" property="commentId" />
+        <result column="commodity_id" property="commodityId" />
+        <result column="user_id" property="userId" />
+        <result column="comment_content" property="commentContent" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 分页返回评论列表 -->
+    <resultMap id="pageCommentResult" extends="BaseResultMap" type="com.shopping.mall.entity.dto.CommentDTO">
+        <association property="user" resultMap="com.shopping.mall.dao.UserMapper.BaseResultMap"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        comment_id, commodity_id, user_id, comment_content, create_time, update_time
+    </sql>
+
+
+    <select id="pageCommentByCommodityId" parameterType="map" resultMap="pageCommentResult">
+        SELECT
+            ct.*,
+            ur.user_name,
+            ur.user_img
+        FROM
+            shooping_mall_commodity cy
+            LEFT JOIN shooping_mall_comment ct ON cy.commodity_id = ct.commodity_id
+            LEFT JOIN shooping_mall_user ur ON ct.user_id = ur.user_id
+        WHERE
+            cy.commodity_id = #{commodityId}
+        ORDER BY ct.create_time desc
+            LIMIT #{page.start},#{page.limit}
+    </select>
+
+</mapper>
