@@ -27,14 +27,9 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
- * @author sihai
- * @version V1.0
- * @Title: AlipayController.java
- * @Package com.sihai.controller
- * @Description: controller
- * Copyright: Copyright (c) 2016
- * Company:FURUIBOKE.SCIENCE.AND.TECHNOLOGY
- * @date 2017年8月18日 上午10:39:15
+ * 支付回调Controller
+ * @author Linn-cn
+ * @date 2020/12/7
  */
 @Controller
 @RequestMapping("/alipay")

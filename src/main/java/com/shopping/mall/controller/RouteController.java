@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 
 /**
- * @program: shopping-mall
- * @classname: RouteController
- * @description: Application页面路由控制器
- * @author: 朱林
- * @create: 2019-11-27 15:17
- **/
+ * Application页面路由控制器
+ * @author Linn-cn
+ * @date 2020/12/7
+ */
 @Controller
 public class RouteController {
 
@@ -147,6 +145,5 @@ public class RouteController {
         ));
         return "order_list";
     }
-
 
 }

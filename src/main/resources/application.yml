@@ -1,6 +1,6 @@
 spring:
   application:
-    name: flea-management
+    name: shopping-mall
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -34,6 +34,8 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 100MB
+  # 该特性决定parser是否允许JSON整数以多个0开始(比如，如果000001赋值给json某变量，
+  # 如果不设置该属性，则解析成int会抛异常报错：
   jackson:
     parser:
       allow-numeric-leading-zeros: true
